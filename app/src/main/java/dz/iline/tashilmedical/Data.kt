@@ -7,7 +7,7 @@ import java.security.MessageDigest
     val facility: String, val role: String, val shift: String, val etab: String, val dept: String, val onDuty: Boolean = false)
 @Entity data class AlertRow(@PrimaryKey val id: String, val fromName: String, val targetRole: String, val ts: Long, val acked: Boolean = false)
 
-@Dao interface Dao {
+@Dao interface TmDao {
     @Query("SELECT * FROM Profile WHERE id=1") suspend fun profile(): Profile?
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun save(p: Profile)
     @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun add(a: AlertRow): Long
@@ -17,7 +17,7 @@ import java.security.MessageDigest
 
 @Database(entities = [Profile::class, AlertRow::class], version = 1, exportSchema = false)
 abstract class Db : RoomDatabase() {
-    abstract fun dao(): Dao
+    abstract fun dao(): TmDao
     companion object {
         @Volatile private var i: Db? = null
         fun get(c: Context): Db = i ?: synchronized(this) {

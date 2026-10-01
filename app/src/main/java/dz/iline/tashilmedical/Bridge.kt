@@ -5,7 +5,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 data class Staff(val name: String, val role: String)
-data class Alert(val id: String, val uid: String, val from: String, val target: String, val ts: Long)
+data class Alert(val id: String, val uid: String, val from: String, val target: String, val ts: Long, val sos: Boolean)
 
 /** GitHub Bridge: one JSON file per user / alert under tm/<etabSerial>/<deptSerial>/ */
 object Bridge {
@@ -52,16 +52,16 @@ object Bridge {
         }
     }
 
-    fun sendAlert(p: Profile, target: String) {
+    fun sendAlert(p: Profile, target: String, sos: Boolean = false) {
         val ts = System.currentTimeMillis(); val id = "${ts}_${p.uid}"
         put("${base(p)}/alerts/$id.json", JSONObject().put("id", id).put("uid", p.uid)
-            .put("from", "${p.name} (${p.role})").put("target", target).put("ts", ts))
+            .put("from", "${p.name} (${p.role})").put("target", target).put("sos", sos).put("ts", ts))
     }
 
     fun newAlerts(p: Profile, since: Long): List<Alert> = names("${base(p)}/alerts")
         .filter { (it.substringBefore('_').toLongOrNull() ?: 0) > since }
         .mapNotNull { n -> runCatching { get("${base(p)}/alerts/$n") }.getOrNull() }
-        .map { Alert(it.getString("id"), it.getString("uid"), it.getString("from"), it.getString("target"), it.getLong("ts")) }
+        .map { Alert(it.getString("id"), it.getString("uid"), it.getString("from"), it.getString("target"), it.getLong("ts"), it.optBoolean("sos")) }
 
     /** (tag, apkUrl) of the latest GitHub Release. */
     fun latest(): Pair<String, String> {

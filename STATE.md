@@ -1,6 +1,5 @@
 # STATE
 
-- Version: v1.0.0-build3
-- Commit: 7e4b40c
-- Built: 2026-10-01
-- Status: APK released
+- Target: v1.0.0-build4
+- Added: Wilaya>Type>Mere>Branch onboarding, security-only SOS, emergency directory, duty auto-off timer, medical shield icon, bottom nav (Dashboard/Historique/Parametres), logout
+- DB schema v2 (destructive migration)

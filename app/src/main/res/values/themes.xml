@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.TM" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#121212</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.TM.Main</item>
+    </style>
+    <style name="Theme.TM.Main" parent="android:Theme.Material.NoActionBar"/>
+</resources>

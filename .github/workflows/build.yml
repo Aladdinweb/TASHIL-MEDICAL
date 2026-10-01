@@ -1,0 +1,32 @@
+name: Build & Release
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['tm/**', 'STATE.md']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "8.9" }
+      - name: Build APK
+        run: gradle :app:assembleDebug --no-daemon
+        env:
+          BRIDGE_TOKEN: ${{ secrets.BRIDGE_TOKEN }}
+          GH_OWNER: ${{ github.repository_owner }}
+          GH_REPO: ${{ github.event.repository.name }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-build${{ github.run_number }}
+          name: TASHIL MEDICAL v1.0.0-build${{ github.run_number }}
+          files: app/build/outputs/apk/debug/app-debug.apk
+      - name: Update STATE.md
+        run: |
+          printf '# STATE\n\n- Version: v1.0.0-build%s\n- Commit: %s\n- Built: %s\n- Status: APK released\n' "${{ github.run_number }}" "${GITHUB_SHA::7}" "$(date -u +%F)" > STATE.md
+          git config user.name github-actions; git config user.email actions@github.com
+          git add STATE.md; git commit -m "STATE: build ${{ github.run_number }}" || true; git push || true
